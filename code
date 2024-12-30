@@ -1,0 +1,115 @@
+
+// Motor pins
+const int motor1Pin1 = 4;
+const int motor1Pin2 = 2;
+const int motor2Pin1 = 15;
+const int motor2Pin2 = 13;
+const int motor3Pin1 = 12;
+const int motor3Pin2 = 27;
+const int motor4Pin1 = 33;
+const int motor4Pin2 = 18;
+
+// IR sensor pins
+const int leftSensor = 25;  // Left IR sensor pin
+const int rightSensor = 26; // Right IR sensor pin
+
+// Motor speed (0-255)
+int motorSpeed = 130;
+
+void setup() {
+  // Set motor pins as outputs
+  pinMode(motor1Pin1, OUTPUT);
+  pinMode(motor1Pin2, OUTPUT);
+  pinMode(motor2Pin1, OUTPUT);
+  pinMode(motor2Pin2, OUTPUT);
+  pinMode(motor3Pin1, OUTPUT);
+  pinMode(motor3Pin2, OUTPUT);
+  pinMode(motor4Pin1, OUTPUT);
+  pinMode(motor4Pin2, OUTPUT);
+
+  // Set IR sensor pins as inputs
+  pinMode(leftSensor, INPUT);
+  pinMode(rightSensor, INPUT);
+
+  Serial.begin(9600); // Initialize serial communication for debugging
+}
+
+void loop() {
+  // Read IR sensor values
+  int leftValue = digitalRead(leftSensor);   // 0 if black, 1 if white
+  int rightValue = digitalRead(rightSensor); // 0 if black, 1 if white
+
+  // Debugging: Print sensor values
+  Serial.print("Left Sensor: ");
+  Serial.print(leftValue);
+  Serial.print(" | Right Sensor: ");
+  Serial.println(rightValue);
+
+  // Check sensor readings and control motors accordingly
+  if (leftValue == 1 && rightValue == 1) {
+    // Both sensors detect black (robot is on the line) -> Move forward
+    moveForward();
+  } else if (leftValue == 0 && rightValue == 0) {
+    // Left sensor detects white, right detects black -> Turn right
+    moveForward();
+  } else if (leftValue == 1 && rightValue == 0) {
+    // Left sensor detects white, right detects black -> Turn right
+    turnRight();
+  } else if (leftValue == 0 && rightValue == 1) {
+    // Left sensor detects black, right detects white -> Turn left
+    turnLeft();
+  } else {
+    // Both sensors detect white -> Stop (robot is off the line)
+    stopMotors();
+  }
+
+  delay(100); // Small delay for sensor readings stability
+}
+
+// Function to move the robot forward
+void moveForward() {
+  analogWrite(motor1Pin1, motorSpeed);
+  analogWrite(motor1Pin2, 0);
+  analogWrite(motor2Pin1, motorSpeed);
+  analogWrite(motor2Pin2, 0);
+  analogWrite(motor3Pin1, motorSpeed);
+  analogWrite(motor3Pin2, 0);
+  analogWrite(motor4Pin1, motorSpeed);
+  analogWrite(motor4Pin2, 0);
+}
+
+// Function to turn the robot left
+void turnLeft() {
+  analogWrite(motor1Pin1, motorSpeed);
+  analogWrite(motor1Pin2, 0);
+  analogWrite(motor2Pin1, 0);
+  analogWrite(motor2Pin2, motorSpeed);
+  analogWrite(motor3Pin1, 0);
+  analogWrite(motor3Pin2, motorSpeed);
+  analogWrite(motor4Pin1, motorSpeed);
+  analogWrite(motor4Pin2, 0);
+}
+
+// Function to turn the robot right
+void turnRight() {
+  analogWrite(motor1Pin1, 0);
+  analogWrite(motor1Pin2, motorSpeed);
+  analogWrite(motor2Pin1, motorSpeed);
+  analogWrite(motor2Pin2, 0);
+  analogWrite(motor3Pin1, motorSpeed);
+  analogWrite(motor3Pin2, 0);
+  analogWrite(motor4Pin1, 0);
+  analogWrite(motor4Pin2, motorSpeed);
+}
+
+// Function to stop the robot
+void stopMotors() {
+  analogWrite(motor1Pin1, 0);
+  analogWrite(motor1Pin2, 0);
+  analogWrite(motor2Pin1, 0);
+  analogWrite(motor2Pin2, 0);
+  analogWrite(motor3Pin1, 0);
+  analogWrite(motor3Pin2, 0);
+  analogWrite(motor4Pin1, 0);
+  analogWrite(motor4Pin2, 0);
+}
